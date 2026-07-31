@@ -202,13 +202,39 @@ def get_analysis(name, price, change):
     try:
         timeframes = {}
         
-        for tf in ['hourly', 'daily', 'weekly']:
-            if tf == 'hourly':
-                hist_data = generate_historical_data(price, 24)
-            elif tf == 'daily':
-                hist_data = generate_historical_data(price, 60)
-            else:
-                hist_data = generate_historical_data(price, 30)
+        # لیست تایم‌فریم‌ها با تعداد روزهای مربوطه
+        timeframe_configs = {
+            'hourly': 1,
+            'daily': 7,
+            'weekly': 30,
+            'monthly': 90,    # 3 ماه
+            'quarterly': 180   # 6 ماه
+        }
+        
+        # نام‌های نمایشی
+        timeframe_labels = {
+            'hourly': 'ساعتی',
+            'daily': 'روزانه',
+            'weekly': 'هفتگی',
+            'monthly': 'ماهانه',
+            'quarterly': 'سه‌ماهه'
+        }
+        
+        for tf, days in timeframe_configs.items():
+            # دریافت داده تاریخی با تعداد روزهای مشخص
+            hist_data = get_crypto_history(name, days)
+            if not hist_data:
+                # اگر داده وجود نداشت، از داده شبیه‌سازی شده استفاده کن
+                if tf == 'hourly':
+                    hist_data = generate_historical_data(price, 24)
+                elif tf == 'daily':
+                    hist_data = generate_historical_data(price, 60)
+                elif tf == 'weekly':
+                    hist_data = generate_historical_data(price, 30)
+                elif tf == 'monthly':
+                    hist_data = generate_historical_data(price, 90)
+                else:  # quarterly
+                    hist_data = generate_historical_data(price, 180)
             
             indicators = calculate_indicators(hist_data)
             if not indicators:
@@ -225,6 +251,7 @@ def get_analysis(name, price, change):
             
             timeframes[tf] = {
                 'timeframe': tf,
+                'label': timeframe_labels.get(tf, tf),
                 'price': round(price, 2),
                 'signal': signal,
                 'signal_text': signal_text,
@@ -275,5 +302,6 @@ def history(crypto_id):
 
 if __name__ == '__main__':
     print("🚀 برنامه تحلیلگر حرفه‌ای راه‌اندازی شد...")
+    print("📌 تایم‌فریم‌ها: ساعتی، روزانه، هفتگی، ماهانه، سه‌ماهه")
     print("📌 صفحه اصلی: /")
     app.run(debug=False, host='0.0.0.0', port=10000)
