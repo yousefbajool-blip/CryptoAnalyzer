@@ -9,14 +9,11 @@ from datetime import datetime, timedelta
 import warnings
 warnings.filterwarnings("ignore")
 
-app = Flask(__name__, template_folder='templates')
+app = Flask(__name__)
 
 # ============================================
 # تنظیمات اولیه
 # ============================================
-DATA_FILE = os.path.join(os.path.dirname(__file__), 'data', 'trades.json')
-os.makedirs(os.path.dirname(DATA_FILE), exist_ok=True)
-
 CRYPTO_LIST = {
     'bitcoin': 'بیت‌کوین',
     'ethereum': 'اتریوم',
@@ -36,10 +33,9 @@ CRYPTO_LIST = {
 }
 
 def get_crypto_prices():
-    """دریافت قیمت واقعی از CoinGecko"""
     try:
         ids = ','.join(CRYPTO_LIST.keys())
-        url = f"https://api.coingecko.com/api/v3/simple/price?ids={ids}&vs_currencies=usd&include_24hr_change=true"
+        url = f"https://api.coingecko.com/api/v3/simple/price?ids={ids}&vs_currencies=usd&include_24hr_change=true&include_24hr_vol=true&include_market_cap=true"
         response = requests.get(url, timeout=15)
         
         if response.status_code == 200:
@@ -50,10 +46,14 @@ def get_crypto_prices():
                     item = data[crypto_id]
                     price = float(item.get('usd', 0))
                     change = float(item.get('usd_24h_change', 0))
+                    volume = float(item.get('usd_24h_vol', 0))
+                    market_cap = float(item.get('usd_market_cap', 0))
                     results[crypto_name] = {
                         'id': crypto_id,
                         'price': price,
                         'change': change,
+                        'volume': volume,
+                        'market_cap': market_cap,
                         'high': price * 1.01,
                         'low': price * 0.99
                     }
@@ -64,7 +64,6 @@ def get_crypto_prices():
         return None
 
 def get_crypto_history(crypto_id, days=7):
-    """دریافت تاریخچه قیمت از CoinGecko"""
     try:
         url = f"https://api.coingecko.com/api/v3/coins/{crypto_id}/market_chart?vs_currency=usd&days={days}"
         response = requests.get(url, timeout=15)
@@ -79,9 +78,10 @@ def get_crypto_history(crypto_id, days=7):
 
 def calculate_indicators(data):
     try:
-        close_prices = [d['price'] for d in data]
-        high_prices = [d.get('high', p * 1.01) for d, p in zip(data, close_prices)]
-        low_prices = [d.get('low', p * 0.99) for d, p in zip(data, close_prices)]
+        close_prices = [d['close'] for d in data]
+        high_prices = [d['high'] for d in data]
+        low_prices = [d['low'] for d in data]
+        volumes = [d.get('volume', 1) for d in data]
         
         if len(close_prices) < 20:
             return None
@@ -140,9 +140,9 @@ def calculate_indicators(data):
         obv = 0
         for i in range(1, len(close_prices)):
             if close_prices[-i] > close_prices[-i-1]:
-                obv += 1
+                obv += volumes[-i]
             elif close_prices[-i] < close_prices[-i-1]:
-                obv -= 1
+                obv -= volumes[-i]
         
         fib_high = max(close_prices[-20:]) if len(close_prices) >= 20 else max(close_prices)
         fib_low = min(close_prices[-20:]) if len(close_prices) >= 20 else min(close_prices)
@@ -159,13 +159,13 @@ def calculate_indicators(data):
             tr = []
             for i in range(1, 15):
                 if i < len(close_prices):
-                    high_diff = high_prices[-i] - high_prices[-i-1] if i < len(high_prices) else 0
-                    low_diff = low_prices[-i-1] - low_prices[-i] if i < len(low_prices) else 0
+                    high_diff = high_prices[-i] - high_prices[-i-1]
+                    low_diff = low_prices[-i-1] - low_prices[-i]
                     dm_plus.append(max(high_diff, 0))
                     dm_minus.append(max(low_diff, 0))
-                    tr.append(max(high_prices[-i] - low_prices[-i] if i < len(high_prices) else 0, 
-                                 abs(high_prices[-i] - close_prices[-i-1]) if i < len(high_prices) else 0,
-                                 abs(low_prices[-i] - close_prices[-i-1]) if i < len(low_prices) else 0))
+                    tr.append(max(high_prices[-i] - low_prices[-i], 
+                                 abs(high_prices[-i] - close_prices[-i-1]),
+                                 abs(low_prices[-i] - close_prices[-i-1])))
             if len(dm_plus) > 0 and len(tr) > 0:
                 di_plus = sum(dm_plus[-14:]) / sum(tr[-14:]) * 100 if sum(tr[-14:]) > 0 else 0
                 di_minus = sum(dm_minus[-14:]) / sum(tr[-14:]) * 100 if sum(tr[-14:]) > 0 else 0
@@ -197,6 +197,19 @@ def calculate_indicators(data):
     except Exception as e:
         print(f"خطا در محاسبه اندیکاتورها: {e}")
         return None
+
+def generate_historical_data(price, count=60):
+    data = []
+    for i in range(count, 0, -1):
+        noise = np.random.normal(0, price * 0.01)
+        data.append({
+            'close': price + noise * (i / count),
+            'high': price + noise * (i / count) * 1.01,
+            'low': price + noise * (i / count) * 0.99,
+            'volume': max(100, price * np.random.uniform(0.5, 1.5))
+        })
+    data.append({'close': price, 'high': price * 1.005, 'low': price * 0.995, 'volume': price * 1})
+    return data
 
 def generate_signal(price, indicators):
     if not indicators:
@@ -268,22 +281,30 @@ def generate_signal(price, indicators):
     else:
         return 'NEUTRAL', f'خنثی - {", ".join(reasons[:3]) if reasons else "بدون سیگنال واضح"}', score
 
-def get_analysis(name, price, change, crypto_id):
+def get_analysis(name, price, change):
     try:
         timeframes = {}
         
-        hist_data = get_crypto_history(crypto_id, 7)
-        if not hist_data:
-            hist_data = [{'price': price} for _ in range(30)]
-        
         for tf in ['hourly', 'daily', 'weekly']:
+            if tf == 'hourly':
+                hist_data = generate_historical_data(price, 24)
+            elif tf == 'daily':
+                hist_data = generate_historical_data(price, 60)
+            else:
+                hist_data = generate_historical_data(price, 30)
+            
             indicators = calculate_indicators(hist_data)
             if not indicators:
                 continue
             
             signal, reason, score = generate_signal(price, indicators)
             
-            signal_text = '🟢 خرید' if signal == 'BUY' else '🔴 فروش' if signal == 'SELL' else '🟡 نگهداری'
+            if signal == 'BUY':
+                signal_text = '🟢 خرید'
+            elif signal == 'SELL':
+                signal_text = '🔴 فروش'
+            else:
+                signal_text = '🟡 نگهداری'
             
             timeframes[tf] = {
                 'timeframe': tf,
@@ -307,39 +328,25 @@ def get_analysis(name, price, change, crypto_id):
         print(f"❌ خطا در تحلیل {name}: {str(e)}")
         return None
 
-def load_trades():
-    if os.path.exists(DATA_FILE):
-        try:
-            with open(DATA_FILE, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        except:
-            return []
-    return []
-
-def save_trades(trades):
-    with open(DATA_FILE, 'w', encoding='utf-8') as f:
-        json.dump(trades, f, ensure_ascii=False, indent=2)
-
 @app.route('/')
 def home():
     return render_template('index.html')
-
-@app.route('/simulator')
-def simulator():
-    return render_template('simulator.html')
 
 @app.route('/api/analyze')
 def analyze():
     crypto_data = get_crypto_prices()
     if not crypto_data:
-        return jsonify({'error': 'دریافت داده با خطا مواجه شد - لطفاً دوباره تلاش کنید'})
+        return jsonify({'error': 'دریافت داده با خطا مواجه شد'})
     
     results = {}
     for name, data in crypto_data.items():
-        analysis = get_analysis(name, data['price'], data['change'], data['id'])
+        analysis = get_analysis(name, data['price'], data['change'])
         if analysis:
             analysis['id'] = data['id']
+            analysis['volume'] = data.get('volume', 0)
+            analysis['market_cap'] = data.get('market_cap', 0)
             results[name] = analysis
+        time.sleep(0.3)
     
     return jsonify(results)
 
@@ -351,31 +358,7 @@ def history(crypto_id):
         return jsonify(data)
     return jsonify([])
 
-@app.route('/api/trades', methods=['GET', 'POST', 'DELETE'])
-def trades_api():
-    if request.method == 'GET':
-        return jsonify(load_trades())
-    
-    elif request.method == 'POST':
-        trade = request.json
-        trades = load_trades()
-        trade['id'] = len(trades) + 1
-        trade['date'] = datetime.now().isoformat()
-        trades.append(trade)
-        save_trades(trades)
-        return jsonify({'status': 'success', 'trade': trade})
-    
-    elif request.method == 'DELETE':
-        save_trades([])
-        return jsonify({'status': 'success'})
-
-@app.route('/api/trades/<int:trade_id>', methods=['DELETE'])
-def delete_trade(trade_id):
-    trades = load_trades()
-    trades = [t for t in trades if t.get('id') != trade_id]
-    save_trades(trades)
-    return jsonify({'status': 'success'})
-
 if __name__ == '__main__':
-    print("🚀 برنامه با داده‌های واقعی از CoinGecko راه‌اندازی شد...")
+    print("🚀 برنامه تحلیلگر حرفه‌ای راه‌اندازی شد...")
+    print("📌 صفحه اصلی: http://127.0.0.1:5000/")
     app.run(debug=False, host='0.0.0.0', port=10000)
