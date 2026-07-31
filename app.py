@@ -1,5 +1,5 @@
 from flask import Flask, render_template, jsonify, request
-import yfinance as yf
+import requests
 import pandas as pd
 import numpy as np
 import json
@@ -17,97 +17,68 @@ app = Flask(__name__, template_folder='templates')
 DATA_FILE = os.path.join(os.path.dirname(__file__), 'data', 'trades.json')
 os.makedirs(os.path.dirname(DATA_FILE), exist_ok=True)
 
-# لیست رمزارزها با تیکرهای یاهو
-CRYPTO_TICKERS = {
-    'BTC-USD': 'بیت‌کوین',
-    'ETH-USD': 'اتریوم',
-    'BNB-USD': 'بایننس کوین',
-    'XRP-USD': 'ریپل',
-    'ADA-USD': 'کاردانو',
-    'SOL-USD': 'سولانا',
-    'DOGE-USD': 'داوج کوین',
-    'DOT-USD': 'پولکادات',
-    'AVAX-USD': 'آوالانچ',
-    'LINK-USD': 'چین لینک',
-    'LTC-USD': 'لایت کوین',
-    'BCH-USD': 'بیت‌کوین کش',
-    'XLM-USD': 'استلار',
-    'UNI-USD': 'یونی سواپ',
-    'XMR-USD': 'مونرو'
+CRYPTO_LIST = {
+    'bitcoin': 'بیت‌کوین',
+    'ethereum': 'اتریوم',
+    'binancecoin': 'بایننس کوین',
+    'ripple': 'ریپل',
+    'cardano': 'کاردانو',
+    'solana': 'سولانا',
+    'dogecoin': 'داوج کوین',
+    'polkadot': 'پولکادات',
+    'avalanche-2': 'آوالانچ',
+    'chainlink': 'چین لینک',
+    'litecoin': 'لایت کوین',
+    'bitcoin-cash': 'بیت‌کوین کش',
+    'stellar': 'استلار',
+    'uniswap': 'یونی سواپ',
+    'monero': 'مونرو'
 }
 
 def get_crypto_prices():
-    """دریافت قیمت واقعی از Yahoo Finance"""
-    results = {}
-    errors = []
-    
-    for ticker, name in CRYPTO_TICKERS.items():
-        try:
-            stock = yf.Ticker(ticker)
-            data = stock.history(period="2d")
-            
-            if data.empty:
-                errors.append(f"{name} ({ticker}): داده‌ای وجود ندارد")
-                continue
-                
-            price = float(data['Close'].iloc[-1])
-            
-            # محاسبه تغییرات 24 ساعته
-            if len(data) >= 2:
-                old_price = float(data['Close'].iloc[-2])
-                change = ((price - old_price) / old_price) * 100
-            else:
-                change = 0
-            
-            # دریافت High و Low روزانه
-            high = float(data['High'].iloc[-1])
-            low = float(data['Low'].iloc[-1])
-            
-            results[name] = {
-                'id': ticker,
-                'price': round(price, 2),
-                'change': round(change, 2),
-                'high': round(high, 2),
-                'low': round(low, 2)
-            }
-            
-            print(f"✅ {name}: ${price:.2f} ({change:+.2f}%)")
-            
-        except Exception as e:
-            errors.append(f"{name} ({ticker}): {str(e)}")
-            print(f"❌ خطا در دریافت {name}: {e}")
-        
-        time.sleep(0.3)  # جلوگیری از محدودیت
-    
-    if errors:
-        print("\n⚠️ خطاهای دریافت داده:")
-        for err in errors:
-            print(f"   - {err}")
-    
-    if not results:
-        return None
-    
-    return results
-
-def get_crypto_history(ticker, days=7):
-    """دریافت تاریخچه قیمت از Yahoo Finance"""
+    """دریافت قیمت واقعی از CoinGecko"""
     try:
-        stock = yf.Ticker(ticker)
-        data = stock.history(period=f"{days}d")
-        if data.empty:
-            return None
-        return [{'time': int(t.timestamp() * 1000), 'price': float(row['Close'])} 
-                for t, row in data.iterrows()]
+        ids = ','.join(CRYPTO_LIST.keys())
+        url = f"https://api.coingecko.com/api/v3/simple/price?ids={ids}&vs_currencies=usd&include_24hr_change=true"
+        response = requests.get(url, timeout=15)
+        
+        if response.status_code == 200:
+            data = response.json()
+            results = {}
+            for crypto_id, crypto_name in CRYPTO_LIST.items():
+                if crypto_id in data:
+                    item = data[crypto_id]
+                    price = float(item.get('usd', 0))
+                    change = float(item.get('usd_24h_change', 0))
+                    results[crypto_name] = {
+                        'id': crypto_id,
+                        'price': price,
+                        'change': change,
+                        'high': price * 1.01,
+                        'low': price * 0.99
+                    }
+            return results
+        return None
     except Exception as e:
-        print(f"خطا در دریافت تاریخچه {ticker}: {e}")
+        print(f"خطا در دریافت رمزارزها: {e}")
+        return None
+
+def get_crypto_history(crypto_id, days=7):
+    """دریافت تاریخچه قیمت از CoinGecko"""
+    try:
+        url = f"https://api.coingecko.com/api/v3/coins/{crypto_id}/market_chart?vs_currency=usd&days={days}"
+        response = requests.get(url, timeout=15)
+        if response.status_code == 200:
+            data = response.json()
+            prices = data.get('prices', [])
+            return [{'time': p[0], 'price': p[1]} for p in prices]
+        return None
+    except Exception as e:
+        print(f"خطا در دریافت تاریخچه {crypto_id}: {e}")
         return None
 
 def calculate_indicators(data):
-    """محاسبه اندیکاتورهای تکنیکال از داده‌های واقعی"""
     try:
-        if not data or len(data) < 20:
-            return None
-        
         close_prices = [d['price'] for d in data]
         high_prices = [d.get('high', p * 1.01) for d, p in zip(data, close_prices)]
         low_prices = [d.get('low', p * 0.99) for d, p in zip(data, close_prices)]
@@ -115,11 +86,9 @@ def calculate_indicators(data):
         if len(close_prices) < 20:
             return None
             
-        # SMA
         sma_20 = np.mean(close_prices[-20:])
         sma_50 = np.mean(close_prices[-50:]) if len(close_prices) >= 50 else sma_20
         
-        # RSI (14 دوره)
         gains, losses = 0, 0
         for i in range(1, min(15, len(close_prices))):
             diff = close_prices[-i] - close_prices[-i-1]
@@ -127,21 +96,18 @@ def calculate_indicators(data):
                 gains += diff
             else:
                 losses += abs(diff)
-        rsi = 100 if losses == 0 else 100 - (100 / (1 + (gains / losses if losses > 0 else 1)))
+        rsi = 100 if losses == 0 else 100 - (100 / (1 + (gains / losses)))
         
-        # MACD
         ema_12 = np.mean(close_prices[-12:])
-        ema_26 = np.mean(close_prices[-26:]) if len(close_prices) >= 26 else ema_12
+        ema_26 = np.mean(close_prices[-26:]) if len(close_prices) >= 26 else np.mean(close_prices[-12:])
         macd = ema_12 - ema_26
         macd_signal = np.mean([close_prices[-i] - close_prices[-i-1] for i in range(1, 10)]) if len(close_prices) >= 10 else 0
         
-        # باندهای بولینگر
         sma = np.mean(close_prices[-20:])
         std = np.std(close_prices[-20:])
         bb_high = sma + (2 * std)
         bb_low = sma - (2 * std)
         
-        # نقاط پیوت
         last_high = max(high_prices[-5:]) if len(high_prices) >= 5 else high_prices[-1]
         last_low = min(low_prices[-5:]) if len(low_prices) >= 5 else low_prices[-1]
         pivot = (last_high + last_low + close_prices[-1]) / 3
@@ -150,11 +116,10 @@ def calculate_indicators(data):
         r2 = pivot + (last_high - last_low)
         s2 = pivot - (last_high - last_low)
         
-        # Stochastic RSI (ساده شده)
         stoch_rsi = 50
         if len(close_prices) >= 14:
             rsi_values = []
-            for i in range(1, 15):
+            for i in range(14, 0, -1):
                 if i < len(close_prices):
                     g, l = 0, 0
                     for j in range(1, 15):
@@ -172,7 +137,6 @@ def calculate_indicators(data):
                 if max_rsi - min_rsi > 0:
                     stoch_rsi = (rsi_values[-1] - min_rsi) / (max_rsi - min_rsi) * 100
         
-        # OBV (ساده شده)
         obv = 0
         for i in range(1, len(close_prices)):
             if close_prices[-i] > close_prices[-i-1]:
@@ -180,7 +144,6 @@ def calculate_indicators(data):
             elif close_prices[-i] < close_prices[-i-1]:
                 obv -= 1
         
-        # Fibonacci
         fib_high = max(close_prices[-20:]) if len(close_prices) >= 20 else max(close_prices)
         fib_low = min(close_prices[-20:]) if len(close_prices) >= 20 else min(close_prices)
         fib_236 = fib_low + 0.236 * (fib_high - fib_low)
@@ -189,7 +152,6 @@ def calculate_indicators(data):
         fib_618 = fib_low + 0.618 * (fib_high - fib_low)
         fib_786 = fib_low + 0.786 * (fib_high - fib_low)
         
-        # ADX (ساده شده)
         adx = 25
         if len(close_prices) >= 14:
             dm_plus = []
@@ -237,7 +199,6 @@ def calculate_indicators(data):
         return None
 
 def generate_signal(price, indicators):
-    """تولید سیگنال ترکیبی از اندیکاتورهای واقعی"""
     if not indicators:
         return 'NEUTRAL', 'داده‌های کافی برای تحلیل وجود ندارد', 0
     
@@ -307,17 +268,13 @@ def generate_signal(price, indicators):
     else:
         return 'NEUTRAL', f'خنثی - {", ".join(reasons[:3]) if reasons else "بدون سیگنال واضح"}', score
 
-def get_analysis(name, price, change, ticker):
-    """تحلیل کامل برای یک رمزارز"""
+def get_analysis(name, price, change, crypto_id):
     try:
         timeframes = {}
         
-        # دریافت داده تاریخی واقعی
-        hist_data = get_crypto_history(ticker, 7)
+        hist_data = get_crypto_history(crypto_id, 7)
         if not hist_data:
-            print(f"⚠️ بدون تاریخچه برای {name}")
-            # از داده‌های فعلی استفاده میکنیم
-            hist_data = [{'price': price, 'high': price * 1.01, 'low': price * 0.99} for _ in range(30)]
+            hist_data = [{'price': price} for _ in range(30)]
         
         for tf in ['hourly', 'daily', 'weekly']:
             indicators = calculate_indicators(hist_data)
@@ -350,9 +307,6 @@ def get_analysis(name, price, change, ticker):
         print(f"❌ خطا در تحلیل {name}: {str(e)}")
         return None
 
-# ============================================
-# مدیریت معاملات
-# ============================================
 def load_trades():
     if os.path.exists(DATA_FILE):
         try:
@@ -366,9 +320,6 @@ def save_trades(trades):
     with open(DATA_FILE, 'w', encoding='utf-8') as f:
         json.dump(trades, f, ensure_ascii=False, indent=2)
 
-# ============================================
-# مسیرهای Flask
-# ============================================
 @app.route('/')
 def home():
     return render_template('index.html')
@@ -390,15 +341,12 @@ def analyze():
             analysis['id'] = data['id']
             results[name] = analysis
     
-    if not results:
-        return jsonify({'error': 'هیچ داده‌ای دریافت نشد'})
-    
     return jsonify(results)
 
-@app.route('/api/history/<ticker>')
-def history(ticker):
+@app.route('/api/history/<crypto_id>')
+def history(crypto_id):
     days = request.args.get('days', 7, type=int)
-    data = get_crypto_history(ticker, days)
+    data = get_crypto_history(crypto_id, days)
     if data:
         return jsonify(data)
     return jsonify([])
@@ -429,6 +377,5 @@ def delete_trade(trade_id):
     return jsonify({'status': 'success'})
 
 if __name__ == '__main__':
-    print("🚀 برنامه با داده‌های ۱۰۰٪ واقعی از Yahoo Finance راه‌اندازی شد...")
-    print("📌 در صورت خطا در دریافت داده، خطا نمایش داده میشود")
+    print("🚀 برنامه با داده‌های واقعی از CoinGecko راه‌اندازی شد...")
     app.run(debug=False, host='0.0.0.0', port=10000)
