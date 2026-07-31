@@ -116,35 +116,18 @@
                 return;
             }
             
-            // پیدا کردن معامله باز قبلی برای همین رمزارز (برای محاسبه سود)
-            const existingTrade = trades.find(t => t.crypto === crypto && t.status === 'open');
-            
-            let trade = {
+            const trade = {
                 crypto: crypto,
                 type: type,
                 amount: amount,
                 price: price,
                 total: amount * price,
-                status: 'closed', // همیشه بسته
-                date: new Date().toISOString()
+                status: 'closed',
+                date: new Date().toISOString(),
+                buy_price: price,
+                close_price: price,
+                profit: 0
             };
-            
-            // اگر معامله باز قبلی وجود داشت و الان فروش هست، سود محاسبه کن
-            if (existingTrade && type === 'sell') {
-                const profit = (price - existingTrade.price) * Math.min(amount, existingTrade.amount);
-                trade.buy_price = existingTrade.price;
-                trade.profit = profit;
-                trade.close_price = price;
-                trade.amount = Math.min(amount, existingTrade.amount);
-                trade.total = trade.amount * price;
-                
-                // حذف معامله باز قبلی
-                await fetch(`/api/trades/${existingTrade.id}`, { method: 'DELETE' });
-            } else {
-                trade.profit = 0;
-                trade.buy_price = price;
-                trade.close_price = price;
-            }
             
             try {
                 const response = await fetch('/api/trades', {
@@ -184,26 +167,19 @@
             
             const sorted = [...trades].reverse();
             let html = `<table><thead><tr>
-                <th>رمزارز</th><th>نوع</th><th>تعداد</th><th>قیمت خرید</th><th>قیمت فروش</th>
+                <th>رمزارز</th><th>نوع</th><th>تعداد</th><th>قیمت</th>
                 <th>سود/ضرر</th><th>تاریخ</th>
             </tr></thead><tbody>`;
             
             for (const trade of sorted) {
                 const isBuy = trade.type === 'buy';
-                const profit = trade.profit || 0;
-                const profitPercent = trade.buy_price && trade.close_price && trade.buy_price > 0 ? 
-                    ((trade.close_price - trade.buy_price) / trade.buy_price * 100) : 0;
-                const profitClass = profit > 0 ? 'profit' : profit < 0 ? 'loss' : '';
                 
                 html += `<tr>
                     <td><strong>${trade.crypto}</strong></td>
                     <td style="color:${isBuy ? '#00b894' : '#e17055'}">${isBuy ? '🟢 خرید' : '🔴 فروش'}</td>
                     <td>${trade.amount}</td>
-                    <td>$${trade.buy_price ? trade.buy_price.toFixed(2) : trade.price.toFixed(2)}</td>
-                    <td>$${trade.close_price ? trade.close_price.toFixed(2) : '-'}</td>
-                    <td class="${profitClass}">
-                        ${profit !== 0 ? '$' + profit.toFixed(2) + ' (' + (profitPercent >= 0 ? '+' : '') + profitPercent.toFixed(2) + '%)' : '-'}
-                    </td>
+                    <td>$${trade.price.toFixed(2)}</td>
+                    <td>-</td>
                     <td><span style="font-size:.65em;color:rgba(255,255,255,0.3);">${new Date(trade.date).toLocaleDateString('fa-IR')}</span></td>
                 </tr>`;
             }
@@ -214,27 +190,17 @@
         
         function updateStats() {
             let totalCapital = 0;
-            let totalProfit = 0;
             let totalTrades = 0;
-            let winTrades = 0;
             
             for (const trade of trades) {
                 totalTrades++;
-                if (trade.profit > 0) winTrades++;
-                totalProfit += trade.profit || 0;
                 totalCapital += trade.total || 0;
             }
             
             document.getElementById('totalCapital').textContent = '$' + totalCapital.toFixed(2);
-            
-            const profitEl = document.getElementById('totalProfit');
-            profitEl.textContent = (totalProfit >= 0 ? '+' : '') + '$' + totalProfit.toFixed(2);
-            profitEl.className = 'value ' + (totalProfit >= 0 ? 'positive' : 'negative');
-            
+            document.getElementById('totalProfit').textContent = '$0.00';
             document.getElementById('totalTrades').textContent = totalTrades;
-            
-            const winRate = totalTrades > 0 ? Math.round((winTrades / totalTrades) * 100) : 0;
-            document.getElementById('winRate').textContent = winRate + '%';
+            document.getElementById('winRate').textContent = '0%';
         }
         
         window.onload = async function() {
