@@ -1,0 +1,2 @@
+# CryptoAnalyzer
+Trading Analyzer App
