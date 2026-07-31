@@ -1,4 +1,4 @@
-=from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request
 import requests
 import pandas as pd
 import numpy as np
