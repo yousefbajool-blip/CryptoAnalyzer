@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 import warnings
 warnings.filterwarnings("ignore")
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='templates')
 
 # ============================================
 # تنظیمات اولیه
@@ -17,6 +17,7 @@ app = Flask(__name__)
 DATA_FILE = os.path.join(os.path.dirname(__file__), 'data', 'trades.json')
 os.makedirs(os.path.dirname(DATA_FILE), exist_ok=True)
 
+# لیست رمزارزهای مهم
 CRYPTO_LIST = {
     'bitcoin': 'بیت‌کوین',
     'ethereum': 'اتریوم',
@@ -399,6 +400,6 @@ def delete_trade(trade_id):
 if __name__ == '__main__':
     print("🚀 برنامه تحلیلگر حرفه‌ای راه‌اندازی شد...")
     print("📌 مسیرها:")
-    print("   - صفحه اصلی: http://127.0.0.1:5000/")
-    print("   - شبیه‌ساز معاملاتی: http://127.0.0.1:5000/simulator")
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    print("   - صفحه اصلی: /")
+    print("   - شبیه‌ساز معاملاتی: /simulator")
+    app.run(debug=False, host='0.0.0.0', port=10000)
