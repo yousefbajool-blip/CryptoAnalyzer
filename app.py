@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, request
+=from flask import Flask, render_template, jsonify, request
 import requests
 import pandas as pd
 import numpy as np
@@ -14,6 +14,9 @@ app = Flask(__name__)
 # ============================================
 # تنظیمات اولیه
 # ============================================
+DATA_FILE = os.path.join(os.path.dirname(__file__), 'data', 'trades.json')
+os.makedirs(os.path.dirname(DATA_FILE), exist_ok=True)
+
 CRYPTO_LIST = {
     'bitcoin': 'بیت‌کوین',
     'ethereum': 'اتریوم',
@@ -35,9 +38,8 @@ CRYPTO_LIST = {
 def get_crypto_prices():
     try:
         ids = ','.join(CRYPTO_LIST.keys())
-        url = f"https://api.coingecko.com/api/v3/simple/price?ids={ids}&vs_currencies=usd&include_24hr_change=true&include_24hr_vol=true&include_market_cap=true"
+        url = f"https://api.coingecko.com/api/v3/simple/price?ids={ids}&vs_currencies=usd&include_24hr_change=true"
         response = requests.get(url, timeout=15)
-        
         if response.status_code == 200:
             data = response.json()
             results = {}
@@ -46,14 +48,10 @@ def get_crypto_prices():
                     item = data[crypto_id]
                     price = float(item.get('usd', 0))
                     change = float(item.get('usd_24h_change', 0))
-                    volume = float(item.get('usd_24h_vol', 0))
-                    market_cap = float(item.get('usd_market_cap', 0))
                     results[crypto_name] = {
                         'id': crypto_id,
                         'price': price,
                         'change': change,
-                        'volume': volume,
-                        'market_cap': market_cap,
                         'high': price * 1.01,
                         'low': price * 0.99
                     }
@@ -328,9 +326,26 @@ def get_analysis(name, price, change):
         print(f"❌ خطا در تحلیل {name}: {str(e)}")
         return None
 
+def load_trades():
+    if os.path.exists(DATA_FILE):
+        try:
+            with open(DATA_FILE, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except:
+            return []
+    return []
+
+def save_trades(trades):
+    with open(DATA_FILE, 'w', encoding='utf-8') as f:
+        json.dump(trades, f, ensure_ascii=False, indent=2)
+
 @app.route('/')
 def home():
     return render_template('index.html')
+
+@app.route('/simulator')
+def simulator():
+    return render_template('simulator.html')
 
 @app.route('/api/analyze')
 def analyze():
@@ -343,8 +358,6 @@ def analyze():
         analysis = get_analysis(name, data['price'], data['change'])
         if analysis:
             analysis['id'] = data['id']
-            analysis['volume'] = data.get('volume', 0)
-            analysis['market_cap'] = data.get('market_cap', 0)
             results[name] = analysis
         time.sleep(0.3)
     
@@ -358,7 +371,34 @@ def history(crypto_id):
         return jsonify(data)
     return jsonify([])
 
+@app.route('/api/trades', methods=['GET', 'POST', 'DELETE'])
+def trades_api():
+    if request.method == 'GET':
+        return jsonify(load_trades())
+    
+    elif request.method == 'POST':
+        trade = request.json
+        trades = load_trades()
+        trade['id'] = len(trades) + 1
+        trade['date'] = datetime.now().isoformat()
+        trades.append(trade)
+        save_trades(trades)
+        return jsonify({'status': 'success', 'trade': trade})
+    
+    elif request.method == 'DELETE':
+        save_trades([])
+        return jsonify({'status': 'success', 'message': 'همه معاملات حذف شدند'})
+
+@app.route('/api/trades/<int:trade_id>', methods=['DELETE'])
+def delete_trade(trade_id):
+    trades = load_trades()
+    trades = [t for t in trades if t.get('id') != trade_id]
+    save_trades(trades)
+    return jsonify({'status': 'success'})
+
 if __name__ == '__main__':
     print("🚀 برنامه تحلیلگر حرفه‌ای راه‌اندازی شد...")
-    print("📌 صفحه اصلی: http://127.0.0.1:5000/")
-    app.run(debug=False, host='0.0.0.0', port=10000)
+    print("📌 مسیرها:")
+    print("   - صفحه اصلی: http://127.0.0.1:5000/")
+    print("   - شبیه‌ساز معاملاتی: http://127.0.0.1:5000/simulator")
+    app.run(debug=True, host='0.0.0.0', port=5000)
