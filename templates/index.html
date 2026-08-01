@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        *{margin:0;padding:0;box-sizing:border-box}body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);min-height:100vh;padding:20px;color:#fff}.container{max-width:1600px;margin:0 auto}.header{text-align:center;padding:25px 0;background:rgba(255,255,255,0.05);border-radius:20px;margin-bottom:25px;backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.1)}.header h1{font-size:2.2em;background:linear-gradient(135deg,#f7971e,#ffd200);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}.header p{color:rgba(255,255,255,0.6);font-size:1em;margin-top:8px}.header .subtitle{color:rgba(255,255,255,0.35);font-size:.85em}.controls{display:flex;justify-content:center;align-items:center;gap:15px;margin-bottom:25px;flex-wrap:wrap}.btn{padding:10px 25px;border:none;border-radius:50px;font-size:14px;font-weight:600;cursor:pointer;transition:all .3s ease;background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.15)}.btn:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(0,0,0,.3)}.btn-primary{background:linear-gradient(135deg,#f7971e,#ffd200);color:#1a1a2e;border:none}.btn-primary:hover{transform:translateY(-2px) scale(1.02)}.btn-primary:disabled{opacity:.6;cursor:not-allowed}.filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.filters input,.filters select{padding:8px 15px;border-radius:25px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.08);color:#fff;font-size:13px;outline:none}.filters input::placeholder{color:rgba(255,255,255,0.4)}.filters select option{background:#1a1a2e;color:#fff}.asset-section{margin-bottom:35px;background:rgba(255,255,255,0.03);border-radius:15px;padding:15px;border:1px solid rgba(255,255,255,0.05)}.asset-title{font-size:1.4em;font-weight:700;margin-bottom:12px;padding:8px 15px;background:rgba(255,255,255,0.05);border-radius:12px;border-right:4px solid #f7971e;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;cursor:pointer}.asset-title .change{font-size:.7em}.asset-title .change.positive{color:#00b894}.asset-title .change.negative{color:#e17055}.timeframes-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.timeframe-card{background:rgba(255,255,255,0.05);border-radius:10px;padding:10px;backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.08);transition:all .3s ease}.timeframe-card:hover{transform:translateY(-2px);border-color:rgba(255,255,255,0.2)}.timeframe-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid rgba(255,255,255,0.08)}.timeframe-label{font-size:.6em;font-weight:600;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1px}.timeframe-price{font-size:1.2em;font-weight:700}.badge{padding:2px 8px;border-radius:50px;font-size:.55em;font-weight:600}.badge-buy{background:#00b894;color:#fff}.badge-sell{background:#e17055;color:#fff}.badge-hold{background:#fdcb6e;color:#1a1a2e}.badge-score{background:rgba(255,255,255,0.1);color:#fff;font-size:.5em;padding:2px 6px;border-radius:10px}.suggestion-text{background:rgba(255,255,255,0.06);border-radius:6px;padding:6px;margin:6px 0;font-size:.7em;color:rgba(255,255,255,0.8);border-right:2px solid #f7971e}.levels-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:6px}.level-item{background:rgba(255,255,255,0.05);border-radius:4px;padding:3px 4px;text-align:center}.level-item .label{font-size:.45em;color:rgba(255,255,255,0.35);text-transform:uppercase}.level-item .value{font-size:.65em;font-weight:600}.indicators-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:6px}.indicator-item{background:rgba(255,255,255,0.05);border-radius:4px;padding:3px 4px;text-align:center}.indicator-item .label{font-size:.4em;color:rgba(255,255,255,0.35);text-transform:uppercase}.indicator-item .value{font-size:.65em;font-weight:600}.value-buy{color:#00b894}.value-sell{color:#e17055}.value-neutral{color:#fdcb6e}.chart-container{margin-top:10px;background:rgba(255,255,255,0.03);border-radius:8px;padding:8px}.chart-container canvas{max-height:120px;width:100%!important}.chart-toggle{cursor:pointer;color:rgba(255,255,255,0.4);font-size:.7em;transition:all .3s ease}.chart-toggle:hover{color:#f7971e}.loading{text-align:center;padding:40px;font-size:1.1em;color:rgba(255,255,255,0.5)}.loading .spinner{animation:spin 1s linear infinite;font-size:2em;display:block;margin-bottom:15px}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.footer{text-align:center;padding:20px 0;color:rgba(255,255,255,0.2);font-size:.8em;margin-top:20px}.timeframe-badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:.55em;font-weight:600;background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.5);margin-bottom:4px}.fib-text{font-size:.55em;color:rgba(255,255,255,0.25);margin-top:4px}
+        *{margin:0;padding:0;box-sizing:border-box}body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);min-height:100vh;padding:20px;color:#fff}.container{max-width:1600px;margin:0 auto}.header{text-align:center;padding:25px 0;background:rgba(255,255,255,0.05);border-radius:20px;margin-bottom:25px;backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.1)}.header h1{font-size:2.2em;background:linear-gradient(135deg,#f7971e,#ffd200);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}.header p{color:rgba(255,255,255,0.6);font-size:1em;margin-top:8px}.header .subtitle{color:rgba(255,255,255,0.35);font-size:.85em}.controls{display:flex;justify-content:center;align-items:center;gap:15px;margin-bottom:25px;flex-wrap:wrap}.btn{padding:10px 25px;border:none;border-radius:50px;font-size:14px;font-weight:600;cursor:pointer;transition:all .3s ease;background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.15)}.btn:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(0,0,0,.3)}.btn-primary{background:linear-gradient(135deg,#f7971e,#ffd200);color:#1a1a2e;border:none}.btn-primary:hover{transform:translateY(-2px) scale(1.02)}.btn-primary:disabled{opacity:.6;cursor:not-allowed}.filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.filters input,.filters select{padding:8px 15px;border-radius:25px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.08);color:#fff;font-size:13px;outline:none}.filters input::placeholder{color:rgba(255,255,255,0.4)}.filters select option{background:#1a1a2e;color:#fff}.asset-section{margin-bottom:35px;background:rgba(255,255,255,0.03);border-radius:15px;padding:15px;border:1px solid rgba(255,255,255,0.05)}.asset-title{font-size:1.4em;font-weight:700;margin-bottom:12px;padding:8px 15px;background:rgba(255,255,255,0.05);border-radius:12px;border-right:4px solid #f7971e;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;cursor:pointer}.asset-title .change{font-size:.7em}.asset-title .change.positive{color:#00b894}.asset-title .change.negative{color:#e17055}.timeframes-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.timeframe-card{background:rgba(255,255,255,0.05);border-radius:10px;padding:10px;backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.08);transition:all .3s ease;position:relative;overflow:hidden}.timeframe-card:hover{transform:translateY(-2px);border-color:rgba(255,255,255,0.2)}.timeframe-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid rgba(255,255,255,0.08)}.timeframe-label{font-size:.6em;font-weight:600;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1px}.timeframe-price{font-size:1.2em;font-weight:700}.badge{padding:2px 8px;border-radius:50px;font-size:.55em;font-weight:600}.badge-buy{background:#00b894;color:#fff}.badge-sell{background:#e17055;color:#fff}.badge-hold{background:#fdcb6e;color:#1a1a2e}.badge-strong-buy{background:#00a381;color:#fff;box-shadow:0 0 15px rgba(0,184,148,0.5)}.badge-strong-sell{background:#d63031;color:#fff;box-shadow:0 0 15px rgba(214,48,49,0.5)}.badge-score{background:rgba(255,255,255,0.1);color:#fff;font-size:.55em;padding:2px 8px;border-radius:10px;font-weight:700}.score-buy{background:rgba(0,184,148,0.3);color:#00b894}.score-sell{background:rgba(225,112,85,0.3);color:#e17055}.score-strong-buy{background:rgba(0,184,148,0.5);color:#00b894;box-shadow:0 0 20px rgba(0,184,148,0.2)}.score-strong-sell{background:rgba(214,48,49,0.5);color:#e17055;box-shadow:0 0 20px rgba(214,48,49,0.2)}.score-neutral{background:rgba(253,203,110,0.2);color:#fdcb6e}.suggestion-text{background:rgba(255,255,255,0.06);border-radius:6px;padding:6px;margin:6px 0;font-size:.7em;color:rgba(255,255,255,0.8);border-right:2px solid #f7971e}.levels-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:6px}.level-item{background:rgba(255,255,255,0.05);border-radius:4px;padding:3px 4px;text-align:center}.level-item .label{font-size:.45em;color:rgba(255,255,255,0.35);text-transform:uppercase}.level-item .value{font-size:.65em;font-weight:600}.indicators-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:6px}.indicator-item{background:rgba(255,255,255,0.05);border-radius:4px;padding:3px 4px;text-align:center}.indicator-item .label{font-size:.4em;color:rgba(255,255,255,0.35);text-transform:uppercase}.indicator-item .value{font-size:.65em;font-weight:600}.value-buy{color:#00b894}.value-sell{color:#e17055}.value-neutral{color:#fdcb6e}.chart-container{margin-top:10px;background:rgba(255,255,255,0.03);border-radius:8px;padding:8px}.chart-container canvas{max-height:120px;width:100%!important}.chart-toggle{cursor:pointer;color:rgba(255,255,255,0.4);font-size:.7em;transition:all .3s ease}.chart-toggle:hover{color:#f7971e}.loading{text-align:center;padding:40px;font-size:1.1em;color:rgba(255,255,255,0.5)}.loading .spinner{animation:spin 1s linear infinite;font-size:2em;display:block;margin-bottom:15px}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.footer{text-align:center;padding:20px 0;color:rgba(255,255,255,0.2);font-size:.8em;margin-top:20px}.timeframe-badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:.55em;font-weight:600;background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.5);margin-bottom:4px}.fib-text{font-size:.55em;color:rgba(255,255,255,0.25);margin-top:4px}.score-bar{display:flex;align-items:center;gap:6px;margin:4px 0}.score-bar .bar{flex:1;height:4px;border-radius:4px;background:rgba(255,255,255,0.1)}.score-bar .fill{height:100%;border-radius:4px;transition:width .5s ease}.score-bar .fill.strong-buy{background:linear-gradient(90deg,#00b894,#00a381)}.score-bar .fill.buy{background:#00b894}.score-bar .fill.neutral{background:#fdcb6e}.score-bar .fill.sell{background:#e17055}.score-bar .fill.strong-sell{background:linear-gradient(90deg,#e17055,#d63031)}.score-value{font-size:.7em;font-weight:700;min-width:30px;text-align:center}
         @media(max-width:1200px){.timeframes-grid{grid-template-columns:repeat(3,1fr)}}
         @media(max-width:992px){.timeframes-grid{grid-template-columns:1fr 1fr}.levels-grid{grid-template-columns:repeat(2,1fr)}.indicators-grid{grid-template-columns:repeat(2,1fr)}}
         @media(max-width:600px){.header h1{font-size:1.5em}.timeframes-grid{grid-template-columns:1fr}.levels-grid{grid-template-columns:1fr 1fr}.indicators-grid{grid-template-columns:1fr 1fr}.filters{flex-direction:column;width:100%}.filters input,.filters select{width:100%}}
@@ -28,15 +28,16 @@
                 <select id="signalFilter" onchange="applyFilters()">
                     <option value="all">همه سیگنال‌ها</option>
                     <option value="BUY">خرید</option>
+                    <option value="STRONG_BUY">خرید قوی</option>
                     <option value="SELL">فروش</option>
+                    <option value="STRONG_SELL">فروش قوی</option>
                     <option value="NEUTRAL">نگهداری</option>
                 </select>
                 <select id="sortFilter" onchange="applyFilters()">
                     <option value="default">مرتب‌سازی پیش‌فرض</option>
+                    <option value="score-high">قوی‌ترین سیگنال</option>
                     <option value="change-high">بیشترین رشد</option>
                     <option value="change-low">بیشترین افت</option>
-                    <option value="price-high">بیشترین قیمت</option>
-                    <option value="price-low">کمترین قیمت</option>
                 </select>
             </div>
         </div>
@@ -77,34 +78,46 @@
             }
         }
 
+        function getSignalInfo(signal, score) {
+            if (signal === 'BUY' && score > 25) return { badge: 'badge-strong-buy', text: 'خرید قوی', scoreClass: 'score-strong-buy', barClass: 'strong-buy' };
+            if (signal === 'BUY') return { badge: 'badge-buy', text: 'خرید', scoreClass: 'score-buy', barClass: 'buy' };
+            if (signal === 'SELL' && score < -25) return { badge: 'badge-strong-sell', text: 'فروش قوی', scoreClass: 'score-strong-sell', barClass: 'strong-sell' };
+            if (signal === 'SELL') return { badge: 'badge-sell', text: 'فروش', scoreClass: 'score-sell', barClass: 'sell' };
+            return { badge: 'badge-hold', text: 'نگهداری', scoreClass: 'score-neutral', barClass: 'neutral' };
+        }
+
         function renderData(e) {
             const t=document.getElementById('results');
             let r='', a=0;
             const n={hourly:'⏰ ساعتی', daily:'📅 روزانه', weekly:'📆 هفتگی', monthly:'📊 ماهانه', quarterly:'📈 سه‌ماهه'};
             const l={hourly:'#667eea', daily:'#f7971e', weekly:'#e17055', monthly:'#00b894', quarterly:'#9b59b6'};
             let o=Object.entries(e);
+            
             const d=document.getElementById('signalFilter').value;
-            if('all'!==d) {
-                o=o.filter((([e,t])=> {
-                    const r=Object.values(t.timeframes||{}).find(t=>t.signal===d);
-                    return !!r;
-                }));
+            if(d!=='all') {
+                o=o.filter(([name, asset])=> {
+                    return Object.values(asset.timeframes||{}).some(tf=> {
+                        if(d==='STRONG_BUY') return tf.signal==='BUY' && tf.score>25;
+                        if(d==='STRONG_SELL') return tf.signal==='SELL' && tf.score<-25;
+                        return tf.signal===d;
+                    });
+                });
             }
+            
             const s=document.getElementById('searchInput').value.toLowerCase();
-            if(s) o=o.filter((([e,t])=>e.includes(s)));
+            if(s) o=o.filter(([name])=>name.includes(s));
+            
             const c=document.getElementById('sortFilter').value;
-            if('change-high'===c) o.sort(((e,t)=>t[1].change-e[1].change));
-            else if('change-low'===c) o.sort(((e,t)=>e[1].change-t[1].change));
-            else if('price-high'===c) o.sort(((e,t)=> {
-                const r=Object.values(e[1].timeframes||{})[0]?.price||0;
-                const a=Object.values(t[1].timeframes||{})[0]?.price||0;
-                return a-r;
-            }));
-            else if('price-low'===c) o.sort(((e,t)=> {
-                const r=Object.values(e[1].timeframes||{})[0]?.price||0;
-                const a=Object.values(t[1].timeframes||{})[0]?.price||0;
-                return r-a;
-            }));
+            if(c==='score-high') {
+                o.sort((a,b)=> {
+                    const scoresA=Object.values(a[1].timeframes||{}).map(t=>t.score||0);
+                    const scoresB=Object.values(b[1].timeframes||{}).map(t=>t.score||0);
+                    const maxA=scoresA.length?Math.max(...scoresA):0;
+                    const maxB=scoresB.length?Math.max(...scoresB):0;
+                    return Math.abs(maxB)-Math.abs(maxA);
+                });
+            } else if(c==='change-high') o.sort((a,b)=>b[1].change-a[1].change);
+            else if(c==='change-low') o.sort((a,b)=>a[1].change-b[1].change);
 
             for(const [e,d] of o) {
                 const o=d.timeframes||{}, s=d.change||0, c=s>=0?'positive':'negative';
@@ -113,8 +126,39 @@
                 chartVisible[i]=!1;
                 r+=`<div class="asset-section"><div class="asset-title" onclick="toggleChart('${i}')"><span>💰 ${e}</span><span class="change ${c}">تغییر ۲۴h: ${s>=0?'▲':'▼'} ${Math.abs(s).toFixed(2)}%</span></div><div class="timeframes-grid">`;
                 for(const [e,t] of Object.entries(o)) {
-                    const a=t.indicators||{}, d=t.signal||'NEUTRAL', s='BUY'===d?'🟢 خرید':'SELL'===d?'🔴 فروش':'🟡 نگهداری', c='BUY'===d?'badge-buy':'SELL'===d?'badge-sell':'badge-hold', h=t.score||0, u=n[e]||e;
-                    r+=`<div class="timeframe-card" style="border-top:3px solid ${l[e]||'#667eea'}"><div class="timeframe-header"><span class="timeframe-label">${u}</span><span><span class="badge ${c}">${s}</span><span class="badge-score">${h>0?'+':''}${h}</span></span></div><div class="timeframe-price">$${Number(t.price).toLocaleString()}</div><div class="suggestion-text">💡 ${t.reason||'در حال تحلیل...'}</div><div class="levels-grid"><div class="level-item"><div class="label">S2</div><div class="value">$${Number(a.s2||0).toLocaleString()}</div></div><div class="level-item"><div class="label">S1</div><div class="value">$${Number(a.s1||0).toLocaleString()}</div></div><div class="level-item"><div class="label">پیوت</div><div class="value">$${Number(a.pivot||0).toLocaleString()}</div></div><div class="level-item"><div class="label">R1</div><div class="value">$${Number(a.r1||0).toLocaleString()}</div></div></div><div class="indicators-grid"><div class="indicator-item"><div class="label">RSI</div><div class="value ${a.rsi>70?'value-sell':a.rsi<30?'value-buy':'value-neutral'}">${a.rsi||'-'}</div></div><div class="indicator-item"><div class="label">Stoch</div><div class="value ${a.stoch_rsi>80?'value-sell':a.stoch_rsi<20?'value-buy':'value-neutral'}">${a.stoch_rsi||'-'}</div></div><div class="indicator-item"><div class="label">MACD</div><div class="value ${a.macd>0?'value-buy':'value-sell'}">${a.macd?Number(a.macd).toFixed(4):'-'}</div></div><div class="indicator-item"><div class="label">ADX</div><div class="value ${a.adx>40?'value-buy':'value-neutral'}">${a.adx||'-'}</div></div><div class="indicator-item"><div class="label">SMA20</div><div class="value">$${Number(a.sma_20||0).toLocaleString()}</div></div><div class="indicator-item"><div class="label">SMA50</div><div class="value">$${Number(a.sma_50||0).toLocaleString()}</div></div><div class="indicator-item"><div class="label">↑باند</div><div class="value" style="color:#e17055;">$${Number(a.bb_high||0).toLocaleString()}</div></div><div class="indicator-item"><div class="label">↓باند</div><div class="value" style="color:#00b894;">$${Number(a.bb_low||0).toLocaleString()}</div></div></div><div class="fib-text">فیبو: ۲۳.۶% $${Number(a.fib_236||0).toLocaleString()} | ۶۱.۸% $${Number(a.fib_618||0).toLocaleString()}</div></div>`;
+                    const a=t.indicators||{}, d=t.signal||'NEUTRAL', h=t.score||0;
+                    const sigInfo=getSignalInfo(d, h);
+                    const s='BUY'===d?'🟢 خرید':'SELL'===d?'🔴 فروش':'🟡 نگهداری';
+                    const u=n[e]||e;
+                    r+=`<div class="timeframe-card" style="border-top:3px solid ${l[e]||'#667eea'}">
+                        <div class="timeframe-header">
+                            <span class="timeframe-label">${u}</span>
+                            <span><span class="badge ${sigInfo.badge}">${sigInfo.text}</span></span>
+                        </div>
+                        <div class="timeframe-price">$${Number(t.price).toLocaleString()}</div>
+                        <div class="score-bar">
+                            <span class="score-value ${sigInfo.scoreClass}">${h>0?'+':''}${h}</span>
+                            <div class="bar"><div class="fill ${sigInfo.barClass}" style="width:${Math.min(Math.abs(h)/35*100,100)}%"></div></div>
+                        </div>
+                        <div class="suggestion-text">💡 ${t.reason||'در حال تحلیل...'}</div>
+                        <div class="levels-grid">
+                            <div class="level-item"><div class="label">S2</div><div class="value">$${Number(a.s2||0).toLocaleString()}</div></div>
+                            <div class="level-item"><div class="label">S1</div><div class="value">$${Number(a.s1||0).toLocaleString()}</div></div>
+                            <div class="level-item"><div class="label">پیوت</div><div class="value">$${Number(a.pivot||0).toLocaleString()}</div></div>
+                            <div class="level-item"><div class="label">R1</div><div class="value">$${Number(a.r1||0).toLocaleString()}</div></div>
+                        </div>
+                        <div class="indicators-grid">
+                            <div class="indicator-item"><div class="label">RSI</div><div class="value ${a.rsi>70?'value-sell':a.rsi<30?'value-buy':'value-neutral'}">${a.rsi||'-'}</div></div>
+                            <div class="indicator-item"><div class="label">Stoch</div><div class="value ${a.stoch_rsi>80?'value-sell':a.stoch_rsi<20?'value-buy':'value-neutral'}">${a.stoch_rsi||'-'}</div></div>
+                            <div class="indicator-item"><div class="label">MACD</div><div class="value ${a.macd>0?'value-buy':'value-sell'}">${a.macd?Number(a.macd).toFixed(4):'-'}</div></div>
+                            <div class="indicator-item"><div class="label">ADX</div><div class="value ${a.adx>40?'value-buy':'value-neutral'}">${a.adx||'-'}</div></div>
+                            <div class="indicator-item"><div class="label">SMA20</div><div class="value">$${Number(a.sma_20||0).toLocaleString()}</div></div>
+                            <div class="indicator-item"><div class="label">SMA50</div><div class="value">$${Number(a.sma_50||0).toLocaleString()}</div></div>
+                            <div class="indicator-item"><div class="label">↑باند</div><div class="value" style="color:#e17055;">$${Number(a.bb_high||0).toLocaleString()}</div></div>
+                            <div class="indicator-item"><div class="label">↓باند</div><div class="value" style="color:#00b894;">$${Number(a.bb_low||0).toLocaleString()}</div></div>
+                        </div>
+                        <div class="fib-text">فیبو: ۲۳.۶% $${Number(a.fib_236||0).toLocaleString()} | ۶۱.۸% $${Number(a.fib_618||0).toLocaleString()}</div>
+                    </div>`;
                 }
                 r+=`</div><div class="chart-container" id="${i}" style="display:none;"><canvas id="canvas-${i}"></canvas><div style="text-align:center;font-size:.7em;color:rgba(255,255,255,0.3);margin-top:5px;"><span class="chart-toggle" onclick="toggleChart('${i}')">🔽 بستن چارت</span></div></div></div>`;
             }
